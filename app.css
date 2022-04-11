@@ -1,0 +1,13 @@
+.todo {
+    color: fuchsia;
+}
+
+.todo:hover{
+    background-color: pink;
+    transition: all 200;
+}
+
+.completed {
+    color: grey;
+    text-decoration: line-through;
+}
