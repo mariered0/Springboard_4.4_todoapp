@@ -3,13 +3,15 @@ const input = document.querySelector('#input');
 const todoList = document.querySelector('#todo-list')
 const completed = document.querySelectorAll('li.completed');
 let todos = [];
+let todoText = input.value;
+let todo = {
+    text: todoText,
+    id: '',
+    completed: false
+};
 
 function storeTodos() {
     localStorage.setItem('todos', JSON.stringify(todos));
-}
-
-function getTodos() {
-    JSON.parse(localStorage.getItem('todos'))
 }
 
 let storedTodos = JSON.parse(localStorage.getItem('todos'));
@@ -20,20 +22,23 @@ function setTodos() {
         li.innerText = storedTodos[i]['text'];
         console.log(li);
         li.classList = 'todo';
+        //creating id for stored todo
+        li.setAttribute("id", storedTodos[i]['id']);
         todoList.appendChild(li);
         if (storedTodos[i]['completed'] === true) {
-            li.classList = 'completed';
+            li.classList = 'todo completed';
         }
     }
 }
-setTodos();
 
+// if (!storedTodos == null){
+setTodos();
+// };
 
 form.addEventListener('submit', function (e) {
     e.preventDefault();
     li = document.createElement('li');
     let todoText = input.value;
-    console.log('todoText', todoText);
     li.innerText = todoText;
     input.value = '';
     li.classList = 'todo';
@@ -47,24 +52,26 @@ form.addEventListener('submit', function (e) {
     li.setAttribute("id", todos.indexOf(todo));
     //adding id# to todo array
     todos[todos.indexOf(todo)].id = todos.indexOf(todo);
-    console.log(li);
     todoList.appendChild(li);
     storeTodos();
 });
 
 todoList.addEventListener('click', function (e) {
     e.target.classList.toggle('completed');
-    // localStorage.setItem()
+    let isCompleted = document.querySelector("[id='e.target.id']").getAttribute('class');
+    if(isCompleted === 'todo completed'){
+    todos[e.target.id].completed = true;
+    }else{
+        todos[e.target.id].completed = false;
+    }
+    storeTodos();
 });
 
 todoList.addEventListener('dblclick', function (e) {
     if (e.target.classList.contains('completed')) {
         e.target.remove();
         //removing the removed todo from the todos array
-        console.log('splice', todos.splice(todos.indexOf(e.target.innerHTML), 1));
-        console.log('todos', todos);
         todos.splice(todos.indexOf(e.target.innerHTML), 1);
-        console.log('localStorage', localStorage.getItem('todos')[todos.indexOf(e.target.innerHTML)]);
         storeTodos();
     }
 });
