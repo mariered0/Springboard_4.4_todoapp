@@ -3,18 +3,19 @@ const input = document.querySelector('#input');
 const todoList = document.querySelector('#todo-list')
 const completed = document.querySelectorAll('li.completed');
 
-const storedTodos = JSON.parse(localStorage.getItem('storedTodos')) || [];
+const storedTodos = JSON.parse(localStorage.getItem('storedTodos')) || {};
 
 function setTodos() {
     JSON.parse(localStorage.getItem('storedTodos'));
-    for (let i = 0; i < storedTodos.length; i++) {
+    let nums = Object.keys(storedTodos);
+    for (let num of nums) {
         const li = document.createElement('li');
-        li.innerText = storedTodos[i]['text'];
+        li.innerText = storedTodos[num]['text'];
         li.classList = 'todo';
         //creating id for stored todo
-        li.setAttribute("id", storedTodos[i]['id']);
+        li.setAttribute("id", storedTodos[num]['id']);
         todoList.appendChild(li);
-        if (storedTodos[i]['completed'] === true) {
+        if (storedTodos[num]['completed'] === true) {
             li.classList = 'todo completed';
         }
     }
@@ -33,31 +34,27 @@ form.addEventListener('submit', function (e) {
     li.innerText = todoText;
     input.value = '';
     li.classList = 'todo';
-    //creating ID for todo
-    if(document.getElementById('todo-list').lastChild === null){
+    if (document.getElementById('todo-list').lastChild === null) {
         li.setAttribute('id', 0)
-    }else{
-        li.setAttribute("id", document.getElementById('todo-list').lastChild.id++);
+    } else {
+        li.setAttribute("id", Number(document.getElementById('todo-list').lastChild.id) + 1);
     }
-    let todo = {
+    todoList.appendChild(li);
+    storedTodos[`${document.getElementById('todo-list').lastChild.id}`] = {};
+    storedTodos[`${document.getElementById('todo-list').lastChild.id}`] = {
         text: todoText,
-        id: '',
+        id: `${document.getElementById('todo-list').lastChild.id}`,
         completed: false
     };
-    storedTodos.push(todo);
-    // li.setAttribute("id", 0);
-    //adding id# to storedTodos array
-    storedTodos[storedTodos.indexOf(todo)].id = storedTodos.indexOf(todo);
-    todoList.appendChild(li);
     storeTodos();
 });
 
 todoList.addEventListener('click', function (e) {
     e.target.classList.toggle('completed');
     let isCompleted = document.querySelector(`[id='${e.target.id}']`).getAttribute('class');
-    if(isCompleted === 'todo completed'){
-    storedTodos[e.target.id]['completed'] = true;
-    }else{
+    if (isCompleted === 'todo completed') {
+        storedTodos[e.target.id]['completed'] = true;
+    } else {
         storedTodos[e.target.id]['completed'] = false;
     }
     storeTodos();
@@ -66,8 +63,8 @@ todoList.addEventListener('click', function (e) {
 todoList.addEventListener('dblclick', function (e) {
     if (e.target.classList.contains('completed')) {
         e.target.remove();
-        //removing the removed todo from the storedTodos array
-        storedTodos.splice(e.target.id, 1);
+        //removing the removed todo from the storedTodos object
+        delete storedTodos[e.target.id];
         storeTodos();
     }
 });
@@ -79,6 +76,8 @@ deleteButton.addEventListener('click', function (e) {
     };
     //removing everything in localStorage
     localStorage.clear();
-    //removing everything in storedTodos array
-    storedTodos.splice(0, storedTodos.length);
+    //removing everything in storedTodos object
+    for (key in storedTodos) {
+        delete storedTodos[key];
+    }
 });
